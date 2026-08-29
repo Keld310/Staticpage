@@ -96,6 +96,24 @@ def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
     return new_nodes
 
 
+def text_to_textnodes(text: str) -> list[TextNode]:
+    # Start by tracking the entire input string as a plain TEXT block
+    nodes = [TextNode(text, TextType.TEXT)]
+    
+    # 1. Split by multi-character syntax first (Bold)
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+    
+    # 2. Split by single-character typography (Italic & Code)
+    nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    
+    # 3. Pull out the image and link blocks last
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    
+    return nodes
+
+
 # --- Combined Test/Example Verification Execution Block ---
 if __name__ == "__main__":
     # Define a complex sample node to verify parsing
@@ -110,3 +128,5 @@ if __name__ == "__main__":
     
     for node in final_split_nodes:
         print(node)
+
+
