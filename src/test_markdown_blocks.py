@@ -1,5 +1,5 @@
 import unittest
-from markdown_blocks import markdown_to_blocks, BlockType, block_to_block_type
+from markdown_blocks import markdown_to_blocks, BlockType, block_to_block_type, markdown_to_html_node
 
 class TestBlockMarkdown(unittest.TestCase):
     def test_markdown_to_blocks_basic(self):
@@ -60,6 +60,61 @@ class TestBlockClassifier(unittest.TestCase):
         # Broken numerical step sequence forces standard fallback handling
         bad_ol = "1. First thing\n3. Wrong sequence index step"
         self.assertEqual(block_to_block_type(bad_ol), BlockType.PARAGRAPH)
+
+class TestMarkdownToHTMLNode(unittest.TestCase):
+    def test_markdown_to_html_paragraph(self):
+        """Verify standard text blocks parse into basic paragraph HTML tags."""
+        md = "This is a simple paragraph with some text."
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(html, "<div><p>This is a simple paragraph with some text.</p></div>")
+
+    def test_markdown_to_html_heading(self):
+        """Verify diverse level headers translate to structural h1-h6 tags."""
+        md = "# Main Header\n\n### Sub Header"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(html, "<div><h1>Main Header</h1><h3>Sub Header</h3></div>")
+
+    def test_markdown_to_html_code_block(self):
+        """Ensure code blocks preserve code structures verbatim without tokenizing nested markers."""
+        md = "```\ndef my_func():\n    print('**bold test**')\n```"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        # Verifies the content inside code stays literal and is wrapped in pre/code tags
+        expected = "<div><pre><code>def my_func():\n    print('**bold test**')</code></pre></div>"
+        self.assertEqual(html, expected)
+
+    def test_markdown_to_html_blockquote(self):
+        """Verify blockquotes strip structural angle tags and nest children elements."""
+        md = "> This is a blockquote line.\n> This is another line."
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(html, "<div><blockquote>This is a blockquote line. This is another line.</blockquote></div>")
+
+    def test_markdown_to_html_lists(self):
+        """Verify lists map line steps accurately to lists of individual li elements."""
+        md = "* Item A\n* Item B\n\n1. Step One\n2. Step Two"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        
+        expected = (
+            "<div>"
+            "<ul><li>Item A</li><li>Item B</li></ul>"
+            "<ol><li>Step One</li><li>Step Two</li></ol>"
+            "</div>"
+        )
+        self.assertEqual(html, expected)
+
+    def test_markdown_to_html_with_inline_formatting(self):
+        """Ensure mixed inline formatting (like bolding and links) resolves correctly within blocks."""
+        md = "This has **bold** text and a [link](https://boot.dev)."
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        
+        expected = '<div><p>This has <b>bold</b> text and a <a href="https://boot.dev">link</a>.</p></div>'
+        self.assertEqual(html, expected)
+
 
 if __name__ == "__main__":
     unittest.main()
