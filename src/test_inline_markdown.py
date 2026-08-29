@@ -1,6 +1,6 @@
 import unittest
 from textnode import TextNode, TextType, text_node_to_html_node
-from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 class TestInlineMarkdown(unittest.TestCase):
     def test_split_code(self):
         """Test splitting an inline code block."""
@@ -228,6 +228,26 @@ class TestInlineMarkdown(unittest.TestCase):
         ]
         self.assertListEqual(final_nodes, expected)
 
+
+# --- 6. Master Pipeline Integration Tests ---
+
+    def test_text_to_textnodes(self):
+        """Test full integration processing a paragraph with all style tags."""
+        raw_text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://imgur.com) and a [link](https://boot.dev)"
+        result = text_to_textnodes(raw_text)
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("text", TextType.BOLD),
+            TextNode(" with an ", TextType.TEXT),
+            TextNode("italic", TextType.ITALIC),
+            TextNode(" word and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and an ", TextType.TEXT),
+            TextNode("obi wan image", TextType.IMAGE, "https://imgur.com"),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("link", TextType.LINK, "https://boot.dev"),
+        ]
+        self.assertListEqual(expected, result)
 
 
 if __name__ == "__main__":
