@@ -1,1 +1,1 @@
-python3 src/main.py "https://keld310.github.io/Staticpage/"
+python3 src/main.py "/Staticpage/"

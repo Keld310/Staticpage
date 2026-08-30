@@ -23,7 +23,7 @@ def main():
     generate_pages_recursive(
         dir_path_content="content",      # Path to your source markdown file
         template_path="template.html",     # Path to your HTML template layout
-        dest_dir_path="public",      # Target location to serve at localhost root
+        dest_dir_path="docs",      # Target location to serve at localhost root
         basepath=basepath
         )
     print("Build complete!")
