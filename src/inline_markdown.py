@@ -105,6 +105,7 @@ def text_to_textnodes(text: str) -> list[TextNode]:
     
     # 2. Split by single-character typography (Italic & Code)
     nodes = split_nodes_delimiter(nodes, "*", TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
     nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
     
     # 3. Pull out the image and link blocks last

@@ -1,16 +1,30 @@
-from textnode import TextNode, TextType
+
+from copystatic import clean_and_copy_directory
+from gencontent import generate_pages_recursive
 
 def main():
-    # 1. Create a new TextNode object with dummy values
-    dummy_node = TextNode(
-        text="This is a bold text node", 
-        text_type=TextType.BOLD, 
-        url=None
-    )
     
-    # 2. Print the object to verify the __repr__ method
-    print(dummy_node)
+    source_dir = "static"
+    destination_dir = "public"
+    
+    print("Starting the build process...")
+    
+    
+    clean_and_copy_directory(source_dir, destination_dir)
+    
+    print("All files successfully copied!")
 
-# 3. Call the main function when the script runs
+    print("Generating index page...")
+    
+    generate_pages_recursive(
+        dir_path_content="content",      # Path to your source markdown file
+        template_path="template.html",     # Path to your HTML template layout
+        dest_dir_path="public"      # Target location to serve at localhost root
+    )
+    print("Build complete!")
+
+
+
+
 if __name__ == "__main__":
     main()
