@@ -1,13 +1,17 @@
-
+import sys
 from copystatic import clean_and_copy_directory
 from gencontent import generate_pages_recursive
 
 def main():
     
     source_dir = "static"
-    destination_dir = "public"
+    destination_dir = "docs"
     
-    print("Starting the build process...")
+    basepath = "/"
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
+        
+    print(f"Starting the build process with basepath: '{basepath}'...")
     
     
     clean_and_copy_directory(source_dir, destination_dir)
@@ -15,12 +19,13 @@ def main():
     print("All files successfully copied!")
 
     print("Generating index page...")
-    
+
     generate_pages_recursive(
         dir_path_content="content",      # Path to your source markdown file
         template_path="template.html",     # Path to your HTML template layout
-        dest_dir_path="public"      # Target location to serve at localhost root
-    )
+        dest_dir_path="public",      # Target location to serve at localhost root
+        basepath=basepath
+        )
     print("Build complete!")
 
 

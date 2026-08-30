@@ -17,7 +17,7 @@ def extract_title(markdown):
     # Raise an exception if no H1 header was found in the loop
     raise ValueError("No H1 header found in the provided markdown.")
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     # 1. Print the tracking status message
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     
@@ -40,6 +40,9 @@ def generate_page(from_path, template_path, dest_path):
     # This assumes your template uses exactly {{ Title }} and {{ Content }}
     final_html = template_content.replace("{{ Title }}", page_title)
     final_html = final_html.replace("{{ Content }}", html_content)
+
+    final_html = final_html.replace('href="/', f'href="{basepath}')
+    final_html = final_html.replace('src="/', f'src="{basepath}')
     
     # 7. Create missing destination subdirectories if they do not exist
     dest_dir = os.path.dirname(dest_path)
@@ -51,7 +54,7 @@ def generate_page(from_path, template_path, dest_path):
         f.write(final_html)
 
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     # Loop through all files and folders in the current content directory level
     for item in os.listdir(dir_path_content):
         # Build full absolute/relative paths for the source item
@@ -64,12 +67,13 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
                 # Swap the .md extension out for .html for the build output
                 html_filename = item.replace(".md", ".html")
                 dest_path = os.path.join(dest_dir_path, html_filename)
-                
+
+                               
                 # Reuse your existing single page layout compiler
-                generate_page(src_path, template_path, dest_path)
+                generate_page(src_path, template_path, dest_path, basepath)
         else:
             # If it's a directory, compute the matching destination folder path
             new_dest_dir = os.path.join(dest_dir_path, item)
             
             # Recursively descend into the subfolder to crawl its contents
-            generate_pages_recursive(src_path, template_path, new_dest_dir)
+            generate_pages_recursive(src_path, template_path, new_dest_dir, basepath)
